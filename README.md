@@ -37,7 +37,7 @@ iStoreOS Argon 登入背景相册管理 - 功能介绍
 ----
 界面预览
 
-<img src="[https://raw.githubusercontent.com/mickeywaley/iStoreOS-Login-Background-from-Album/refs/heads/main/%E7%95%8C%E9%9D%A2%E6%88%AA%E5%9B%BE/istoreos%E7%99%BB%E5%85%A5%E7%9B%B8%E5%86%8C%E7%AE%A1%E7%90%86%E9%A1%B5%E9%9D%A2.png" alt="Mobile wallpaper"   />
+<img src="https://raw.githubusercontent.com/mickeywaley/iStoreOS-Login-Background-from-Album/refs/heads/main/%E7%95%8C%E9%9D%A2%E6%88%AA%E5%9B%BE/istoreos%E7%99%BB%E5%85%A5%E7%9B%B8%E5%86%8C%E7%AE%A1%E7%90%86%E9%A1%B5%E9%9D%A2.png" alt="Mobile wallpaper"   />
 
 <img src="https://raw.githubusercontent.com/mickeywaley/iStoreOS-Login-Background-from-Album/refs/heads/main/%E7%95%8C%E9%9D%A2%E6%88%AA%E5%9B%BE/istoreos%E8%8F%9C%E5%8D%95%E9%A1%B5%E9%9D%A2.png" alt="Mobile wallpaper"   />
 
