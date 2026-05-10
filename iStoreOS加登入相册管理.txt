@@ -1,0 +1,85 @@
+极简完整版：OpenWrt/iStoreOS 添加「登入背景相册管理」教程
+（小白专用，全程复制粘贴，每步必清缓存重启）
+一、先备份（防止改错）
+bash
+运行
+cp -r /usr/share/luci/menu.d /usr/share/luci/menu.d.bak
+二、添加菜单（系统→最底部）
+bash
+运行
+cat > /usr/share/luci/menu.d/99-argon-album.json << 'EOF'
+{
+  "admin/system/argon-album": {
+    "title": "登入背景相册管理",
+    "url": "/luci-static/argon/album.htm",
+    "target": "_blank",
+    "order": 99
+  }
+}
+EOF
+bash
+运行
+chmod 644 /usr/share/luci/menu.d/99-argon-album.json
+必须执行：清缓存 + 重启
+bash
+运行
+rm -rf /tmp/luci-*
+/etc/init.d/uhttpd restart
+三、创建相册管理页面
+bash
+运行
+mkdir -p /www/luci-static/argon/backgrounds
+bash
+运行
+cat > /www/luci-static/argon/album.htm << 'EOF'
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>登入背景相册管理</title>
+<style>
+body{background:#1a1a1a;color:#fff;padding:20px;font-family:Arial}
+.container{max-width:1000px;margin:0 auto}
+h1{color:#42b983;text-align:center}
+.upload{border:2px dashed #42b983;padding:30px;text-align:center;margin:20px 0}
+button{background:#42b983;color:#fff;border:none;padding:10px 20px;cursor:pointer;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>登入背景相册管理</h1>
+<div class="upload">
+<p>上传路由器登录背景图片</p>
+<button onclick="alert('请将图片放入 /www/luci-static/argon/backgrounds 目录')">上传图片</button>
+</div>
+<p>访问路径：/luci-static/argon/backgrounds/xxx.jpg</p>
+</div>
+</body>
+</html>
+EOF
+bash
+运行
+chmod 644 /www/luci-static/argon/album.htm
+chmod 755 /www/luci-static/argon/backgrounds
+必须执行：清缓存 + 重启
+bash
+运行
+rm -rf /tmp/luci-*
+/etc/init.d/uhttpd restart
+四、完成效果
+路由器后台 → 系统 → 最底部：登入背景相册管理
+点击直接打开相册管理页面
+图片放入：/www/luci-static/argon/backgrounds 即可使用
+五、一键还原（出错用）
+bash
+运行
+cp -r /usr/share/luci/menu.d.bak /usr/share/luci/menu.d
+rm -rf /tmp/luci-*
+/etc/init.d/uhttpd restart
+六、删除本功能（不用时）
+bash
+运行
+rm -f /usr/share/luci/menu.d/99-argon-album.json
+rm -f /www/luci-static/argon/album.htm
+rm -rf /tmp/luci-*
+/etc/init.d/uhttpd restart
