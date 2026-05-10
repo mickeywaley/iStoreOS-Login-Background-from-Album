@@ -2,21 +2,41 @@
 iStoreOS 登录背景使用相册图片
 
 
-图片预览支持 上一张 / 下一张 切换
+----
 
-预览时显示：文件名 + 文件大小 + 分辨率
+iStoreOS Argon 登入背景相册管理 - 功能介绍
 
-完美适配 PC + 平板 + 手机
+这是为 iStoreOS + Argon 主题 定制的登录背景图片 / 视频可视化管理工具，无需命令行，网页一键管理登录背景文件。
 
-保留所有之前的功能：登录验证、双模式、返回按钮、新窗口打开
+核心功能
 
-预览界面点击空白关闭、键盘左右键切换、ESC 关闭
+双模式浏览
 
-修复所有已知 BUG
+相册模式：网格卡片展示，直观预览所有背景图 / 视频
+
+列表模式：文件清单展示，文件名、尺寸、大小一目了然
+
+一键上传背景支持上传：jpg、png、gif、webp 图片，mp4/webm 视频自动上传到 Argon 主题背景目录：/www/luci-static/argon/background/
+
+精准删除文件点击对应文件的删除按钮，点哪张删哪张，不会误删其他文件
+
+大图预览查看点击图片 / 视频可全屏预览，支持键盘左右键切换、ESC 关闭
+
+快捷返回主题设置一键返回 Argon 主题设置页面，不固定路由器 IP，通用所有 iStoreOS
+
+权限安全校验未登录路由器时自动跳转登录页，防止未授权访问
+
+适用场景
+
+自定义 OpenWrt /iStoreOS 路由器登录页面背景
+
+批量管理、替换登录背景图片 / 视频
+
+无需 SSH、无需敲命令，纯网页可视化操作
 
 ----
 
-一、一键替换终极代码（直接复制整条粘贴）
+一键替换终极代码（直接复制整条粘贴）
 
 SSH 登录路由器，执行以下命令覆盖文件：
 
@@ -26,7 +46,7 @@ cat > /www/luci-static/argon/album.htm << 'EOF'
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>登录背景相册管理</title>
+    <title>iStoreOS-登入背景管理</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
@@ -259,7 +279,7 @@ cat > /www/luci-static/argon/album.htm << 'EOF'
             max-width: 90%;
             max-height: 75vh;
             border-radius: 8px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            box-shadow: 0 0 30 rgba(0,0,0,0.5);
             object-fit: contain;
         }
         .preview-nav {
@@ -348,8 +368,8 @@ cat > /www/luci-static/argon/album.htm << 'EOF'
     <div id="page-content">
         <div class="page-header">
             <h1 class="page-title">
-                🖼️ 登录背景相册管理
-                <button class="back-btn" onclick="goBack()">返回路由器主页</button>
+                🖼️ iStoreOS-登入背景管理
+                <button class="back-btn" onclick="goBack()">返回 Argon 主题设置</button>
             </h1>
             <div class="view-tabs">
                 <button id="btn-grid" class="active">相册模式</button>
@@ -382,8 +402,10 @@ cat > /www/luci-static/argon/album.htm << 'EOF'
 </div>
 
 <script>
-const ROUTER_URL = "/cgi-bin/luci";
+// ===================== 自动路由地址，无需固定IP ======================
 const LOGIN_URL = "/cgi-bin/luci";
+// ====================================================================
+
 const basePath = "/luci-static/argon/background/";
 const ignoreList = ["README.md", "manifest.json", "favicon-", "apple-icon-", "android-icon-", "ms-icon-", "default.jpg", "login-bg.jpg"];
 
@@ -404,7 +426,10 @@ function showLoginTip() {
     document.body.innerHTML = `<div class="container"><div class="login-tip"><h2>🔒 请先登录路由器</h2><p>您尚未登录或会话已过期</p><a href="${LOGIN_URL}" class="login-btn">前往登录</a></div></div>`;
 }
 
-function goBack() { window.open(ROUTER_URL, "_self"); }
+// 自动返回 Argon 主题设置，不固定IP
+function goBack() {
+    window.location.href = "/cgi-bin/luci/admin/system/argon-config";
+}
 
 async function getToken() {
     const r = await fetch("/cgi-bin/luci/admin/system/argon-config");
@@ -467,7 +492,7 @@ function makeCard(file, idx) {
     const del = document.createElement("button");
     del.className="btn-delete";
     del.textContent="删除";
-    del.onclick=e=>{e.stopPropagation();deleteFile(file);};
+    del.onclick=e=>{e.stopPropagation();deleteFile(file,idx+1);};
     btns.append(prev,del);
     info.append(name,size,res,btns);
     card.append(media,info);
@@ -510,7 +535,7 @@ function makeListItem(file) {
     const del = document.createElement("button");
     del.className="btn-delete";
     del.textContent="删除";
-    del.onclick=()=>deleteFile(file);
+    del.onclick=()=>deleteFile(file,fileList.indexOf(file)+1);
     btns.append(prev,del);
     item.append(left,btns);
     if (isImg) {
@@ -540,11 +565,21 @@ async function uploadFile() {
     loadFiles();
 }
 
-async function deleteFile(file) {
-    if (!await checkLogin() || !confirm("确定删除："+file+"？")) return;
-    await fetch("/cgi-bin/luci/admin/system/argon-config",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:`token=${await getToken()}&cbi.submit=1&cbid.table.1.remove=移除&cbid.table.1.name=${encodeURIComponent(file)}`});
+// ===================== 完全沿用你原来能触发删除的格式 =====================
+async function deleteFile(file, line) {
+    if (!await checkLogin()) return;
+    if (!confirm("确定删除："+file+"？")) return;
+
+    const token = await getToken();
+    await fetch("/cgi-bin/luci/admin/system/argon-config", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `token=${token}&cbi.submit=1&cbid.table.${line}.remove=移除&cbid.table.${line}.name=${encodeURIComponent(file)}`
+    });
+
     loadFiles();
 }
+// ======================================================================
 
 function openPreview(idx) {
     currentIndex=idx;
@@ -573,40 +608,12 @@ window.onload=loadFiles;
 </html>
 EOF
 
-```
-
-----
-
-
-二、 然后执行这 2 条生效命令
-
-``` 
-
 chmod 755 /www/luci-static/argon/album.htm
+chmod 777 /www/luci-static/argon/background/
 rm -rf /tmp/luci-*
 /etc/init.d/uhttpd restart
 
 ```
 
-
 ----
 
-✅ 返回按钮 → 自动跳转到路由器后台首页
-
-✅ 不固定 IP，任何机器都能用
-
-✅ 图片预览：上一张 / 下一张
-
-✅ 显示文件名、大小、分辨率
-
-✅ PC + 手机完美适配
-
-✅ 未登录自动屏蔽
-
-✅ 上传 / 删除 / 双模式全部正常
-
-你现在点 返回路由器首页，就会直接回到：
-
-你的IP/cgi-bin/luci/admin/quickstart/
-
-完全自动适配，不用改任何配置！
