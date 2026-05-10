@@ -7,6 +7,8 @@
 ----
 
 
+1；新建正确菜单（复制直接运行）
+
 ``` 
 cat > /usr/share/luci/menu.d/argon-theme-album.json << EOF
 {
@@ -23,3 +25,10 @@ EOF
 
 
 ----
+
+2；清理缓存生效（必须运行）
+
+``` 
+rm -rf /tmp/luci-*
+/etc/init.d/uhttpd restart
+```
