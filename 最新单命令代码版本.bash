@@ -326,7 +326,7 @@ cat > /www/luci-static/argon/album.htm << 'EOF'
         <div class="page-header">
             <h1 class="page-title">
                 🖼️ iStoreOS-登入背景管理
-                <button class="back-btn" onclick="goBack()">返回路由器首页</button>
+                <button class="back-btn" onclick="goBack()">返回 Argon 主题设置</button>
             </h1>
             <div class="view-tabs">
                 <button id="btn-grid" class="active">相册模式</button>
@@ -359,8 +359,10 @@ cat > /www/luci-static/argon/album.htm << 'EOF'
 </div>
 
 <script>
-const ROUTER_ADMIN_HOME = "/cgi-bin/luci/admin/quickstart/";
+// ===================== 自动路由地址，无需固定IP ======================
 const LOGIN_URL = "/cgi-bin/luci";
+// ====================================================================
+
 const basePath = "/luci-static/argon/background/";
 const ignoreList = ["README.md", "manifest.json", "favicon-", "apple-icon-", "android-icon-", "ms-icon-", "default.jpg", "login-bg.jpg"];
 
@@ -381,8 +383,9 @@ function showLoginTip() {
     document.body.innerHTML = `<div class="container"><div class="login-tip"><h2>🔒 请先登录路由器</h2><p>您尚未登录或会话已过期</p><a href="${LOGIN_URL}" class="login-btn">前往登录</a></div></div>`;
 }
 
+// 自动返回 Argon 主题设置，不固定IP
 function goBack() {
-    window.location.href = ROUTER_ADMIN_HOME;
+    window.location.href = "/cgi-bin/luci/admin/system/argon-config";
 }
 
 async function getToken() {
